@@ -1,0 +1,51 @@
+{{--@extendsというディレクティブを使ってベースとなる親ビューを指定--}}
+{{--フォルダ名.ファイル名（.blade.phpは不要）と記述--}}
+@extends('layouts.app')
+
+{{--@sectionというディレクティブを使って「親ビューの@yieldを何で置き換えるか」を指定-}}
+{{--@section('@yieldの引数に指定した名前', '置き換える値')--}}
+@section('title', '投稿一覧')
+
+{{--@section('@yieldの引数に指定した名前')
+    置き換えるコード
+    @endsection--}}
+@section('content')
+   @if (session('flash_message'))
+       <p class="text-success">{{ session('flash_message') }}</p>
+   @endif
+
+   @if (session('error_message'))
+       <p class="text-danger">{{ session('error_message') }}</p>
+   @endif
+
+   <div class="mb-2">
+       <a href="{{ route('posts.create') }}" class="text-decoration-none">新規投稿</a>
+   </div>
+
+   @if($posts->isNotEmpty())
+       @foreach($posts as $post)
+           <article>
+               <div class="card mb-3">
+                   <div class="card-body">
+                       <h2 class="card-title fs-5">{{ $post->title }}</h2>
+                       <p class="card-text">{{ $post->content }}</p><br>
+                       <p>{{ $post->updated_at }}</p>
+
+                       <div class="d-flex">
+                           <a href="{{ route('posts.show', $post) }}" class="btn btn-outline-primary d-block me-1">詳細</a>
+                           <a href="{{ route('posts.edit', $post) }}" class="btn btn-outline-primary d-block me-1">編集</a>
+
+                           <form action="{{ route('posts.destroy', $post) }}" method="POST" onsubmit="return confirm('本当に削除してもよろしいですか？');">
+                               @csrf
+                               @method('DELETE')
+                               <button type="submit" class="btn btn-outline-danger">削除</button>
+                           </form>
+                       </div>
+                   </div>
+               </div>
+           </article>
+       @endforeach
+   @else
+       <p>投稿はありません。</p>
+   @endif
+@endsection

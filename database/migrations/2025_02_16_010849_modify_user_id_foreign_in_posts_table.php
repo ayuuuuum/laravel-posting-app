@@ -12,8 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('posts', function (Blueprint $table) {
-            $table->string('title')->after('id');
-            $table->text('content')->after('title');
+            // まず、現在の外部キー制約を削除
+            $table->dropForeign(['user_id']);
+            // users.id に対する外部キーを再設定
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
@@ -23,7 +25,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('posts', function (Blueprint $table) {
-            $table->dropColumn(['title', 'content']); // 追加したカラムを削除
+            Schema::dropIfExists('users');
         });
     }
 };
